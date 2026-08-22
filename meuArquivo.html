@@ -1,11 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Primeiro Exercício de Front-End | Renan Pollig</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #243447;
+        }
+
+        .pagina {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        header {
+            padding: 32px;
+            background-color: #174b7a;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        main {
+            padding: 32px;
+            line-height: 1.6;
+        }
+
+        section {
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            color: #174b7a;
+        }
+
+        .informacoes {
+            padding: 18px;
+            background-color: #eef5fb;
+            border-left: 4px solid #174b7a;
+            border-radius: 4px;
+        }
+
+        .informacoes p {
+            margin: 6px 0;
+        }
+
+        footer {
+            padding: 18px;
+            background-color: #e8edf2;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
 </head>
+
 <body>
-    
+    <div class="pagina">
+        <header>
+            <h1>Meu Primeiro Exercício de Front-End</h1>
+            <p>Primeiros passos na criação de páginas para a web</p>
+        </header>
+
+        <main>
+            <section>
+                <h2>Sobre a disciplina</h2>
+                <p>
+                    A disciplina de Front-End apresenta as tecnologias usadas para
+                    criar a parte visual e interativa de sites e sistemas. Durante
+                    as aulas, vamos aprender HTML, CSS, JavaScript e outras
+                    ferramentas importantes para o desenvolvimento web.
+                </p>
+            </section>
+
+            <section>
+                <h2>Objetivo deste exercício</h2>
+                <p>
+                    Este exercício tem como objetivo praticar a estrutura básica
+                    de uma página HTML, utilizando títulos, parágrafos, seções e
+                    informações organizadas de forma simples.
+                </p>
+            </section>
+
+            <section class="informacoes">
+                <h2>Informações acadêmicas</h2>
+                <p><strong>Aluno:</strong> Renan Pollig</p>
+                <p><strong>Curso:</strong> Engenharia de Software</p>
+                <p><strong>Disciplina:</strong> Front-End</p>
+                <p><strong>Professora:</strong> Laís</p>
+            </section>
+        </main>
+
+        <footer>
+            <p>Univassouras — Engenharia de Software</p>
+        </footer>
+    </div>
 </body>
 </html>
