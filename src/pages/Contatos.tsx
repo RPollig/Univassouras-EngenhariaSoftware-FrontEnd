@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import ContatoCard from '../components/ContatoCard'
 import { useContatosLocais } from '../contexts/ContatosLocaisContext'
@@ -9,6 +9,8 @@ import type { Contato } from '../types'
 
 export default function Contatos() {
   const { criados, aplicar } = useContatosLocais()
+  const location = useLocation()
+  const aviso = (location.state as { aviso?: string } | null)?.aviso // ex.: "Contato excluído"
 
   const [busca, setBusca] = useState('') // o que está digitado (muda a cada tecla)
   const [termo, setTermo] = useState('') // o que foi buscado (depois da pausa)
@@ -68,6 +70,12 @@ export default function Contatos() {
           + Novo contato
         </Link>
       </div>
+
+      {aviso && (
+        <p role="status" className="aviso sucesso">
+          {aviso}
+        </p>
+      )}
 
       <div className="busca">
         <label htmlFor="busca">Buscar por nome ou e-mail</label>
