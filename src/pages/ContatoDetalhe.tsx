@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useContatosLocais } from '../contexts/ContatosLocaisContext'
 import { buscarContato, excluirContato } from '../services/contatos'
 import { ehNaoEncontrado, mensagemDeErro } from '../utils/erros'
@@ -9,6 +9,8 @@ export default function ContatoDetalhe() {
   const { id: idDaUrl } = useParams() // /contatos/7 → "7" (sempre texto)
   const id = Number(idDaUrl)
   const navigate = useNavigate()
+  const location = useLocation()
+  const avisoSucesso = (location.state as { aviso?: string } | null)?.aviso // ex.: "Alterações salvas."
   const { buscarLocal, foiExcluido, ehLocal, registrarExcluido } = useContatosLocais()
 
   const [contato, setContato] = useState<Contato | null>(null)
@@ -111,6 +113,12 @@ export default function ContatoDetalhe() {
       <Link to="/contatos" className="voltar">
         ← Contatos
       </Link>
+
+      {avisoSucesso && (
+        <p role="status" className="aviso sucesso">
+          {avisoSucesso}
+        </p>
+      )}
 
       <article className="cartao detalhe">
         <div className="detalhe-topo">

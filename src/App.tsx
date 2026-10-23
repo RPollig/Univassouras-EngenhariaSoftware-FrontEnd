@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Painel from './pages/Painel'
 import Contatos from './pages/Contatos'
 import ContatoDetalhe from './pages/ContatoDetalhe'
+import ContatoForm from './pages/ContatoForm'
 import NaoEncontrada from './pages/NaoEncontrada'
 
 // O App é a tabela de rotas
@@ -16,7 +17,9 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<Painel />} />
           <Route path="contatos" element={<Contatos />} />
+          <Route path="contatos/novo" element={<ContatoForm />} />
           <Route path="contatos/:id" element={<ContatoDetalhe />} />
+          <Route path="contatos/:id/editar" element={<ContatoForm />} />
         </Route>
       </Route>
       <Route path="*" element={<NaoEncontrada />} />
