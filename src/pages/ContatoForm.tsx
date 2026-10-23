@@ -104,6 +104,7 @@ export default function ContatoForm() {
   function mudar(e: ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
     setCampos((atual) => ({ ...atual, [name]: value }))
+    setErros((atual) => ({ ...atual, [name]: undefined })) // corrigiu o campo: some o aviso dele
   }
 
   async function aoEnviar(e: FormEvent<HTMLFormElement>) {

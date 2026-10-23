@@ -79,7 +79,7 @@ export default function Painel() {
             </div>
             <div className="cartao numero">
               <span className="numero-valor">{empresas}</span>
-              <span>empresas nos primeiros contatos</span>
+              <span>empresas entre os 10 primeiros</span>
             </div>
           </section>
 
