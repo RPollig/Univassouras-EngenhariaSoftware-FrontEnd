@@ -7,7 +7,7 @@ const CAMPOS = 'firstName,lastName,email,phone,image,company,address'
 export const POR_PAGINA = 10
 
 // R — listar (com busca e paginação). Com texto usa /users/search?q=
-export async function listarContatos(busca: string, pagina: number) {
+export async function listarContatos(busca: string, pagina: number, signal?: AbortSignal) {
   const termo = busca.trim()
   const rota = termo ? '/users/search' : '/users'
   const { data } = await api.get<ListaContatos>(rota, {
@@ -17,6 +17,7 @@ export async function listarContatos(busca: string, pagina: number) {
       skip: pagina * POR_PAGINA,
       select: CAMPOS,
     },
+    signal, // permite cancelar o pedido (busca antiga)
   })
   return { contatos: data.users, total: data.total } // a lista vem dentro de data.users
 }

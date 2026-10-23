@@ -3,6 +3,7 @@ import ProtectedRoute from './routes/ProtectedRoute'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Painel from './pages/Painel'
+import Contatos from './pages/Contatos'
 import NaoEncontrada from './pages/NaoEncontrada'
 
 // O App é a tabela de rotas
@@ -13,6 +14,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
           <Route index element={<Painel />} />
+          <Route path="contatos" element={<Contatos />} />
         </Route>
       </Route>
       <Route path="*" element={<NaoEncontrada />} />
