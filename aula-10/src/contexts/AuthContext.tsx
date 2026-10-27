@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { login as loginApi, me } from '../services/auth'
+import { registrarAoExpirar } from '../services/http'
 import type { Usuario } from '../types'
 
 const CHAVE = 'flynow.token'
@@ -35,11 +36,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  function logout() {
+  // useCallback: a mesma função entre renders (o interceptor guarda esta referência)
+  const logout = useCallback(() => {
     localStorage.removeItem(CHAVE)
     setToken(null)
     setUsuario(null)
-  }
+  }, [])
 
   // Ao abrir o app: tem token salvo? Pergunta à API se ainda vale
   useEffect(() => {
@@ -56,6 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch(() => localStorage.removeItem(CHAVE)) // token vencido ou adulterado
       .finally(() => setCarregando(false))
   }, [])
+
+  // Aula 10: sessão vencida (401 em qualquer pedido) → o interceptor chama o logout
+  useEffect(() => {
+    registrarAoExpirar(logout)
+    return () => registrarAoExpirar(null)
+  }, [logout])
 
   return (
     <AuthContext.Provider value={{ usuario, token, carregando, login, logout }}>

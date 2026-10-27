@@ -21,6 +21,7 @@ export default function Desejos() {
   const [desejos, setDesejos] = useState<Desejo[]>([])
   const [loading, setLoading] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
+  const [tentativa, setTentativa] = useState(0) // muda no botão "Tentar de novo"
 
   // C — formulário controlado
   const [texto, setTexto] = useState('')
@@ -40,6 +41,8 @@ export default function Desejos() {
   useEffect(() => {
     if (userId === undefined) return
     async function carregar(id: number) {
+      setLoading(true)
+      setErro(null)
       try {
         setDesejos(await listarDesejos(id))
       } catch (err) {
@@ -49,7 +52,7 @@ export default function Desejos() {
       }
     }
     carregar(userId)
-  }, [userId])
+  }, [userId, tentativa])
 
   // Criar (C): valida, faz o POST e entrega uma lista NOVA ao estado
   async function aoEnviar(e: FormEvent<HTMLFormElement>) {
@@ -146,9 +149,14 @@ export default function Desejos() {
       {loading ? (
         <p className="estado">Carregando…</p>
       ) : erro ? (
-        <p role="alert" className="aviso erro">
-          {erro}
-        </p>
+        <div className="estado">
+          <p role="alert" className="aviso erro">
+            {erro}
+          </p>
+          <button type="button" className="botao" onClick={() => setTentativa((n) => n + 1)}>
+            Tentar de novo
+          </button>
+        </div>
       ) : desejos.length === 0 ? (
         <p className="vazio">Nenhum desejo ainda. Que tal “Conhecer Lisboa”?</p>
       ) : (
