@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import ContatoCard from '../components/ContatoCard'
+import { Carregando, ErroComTentativa } from '../components/Estados'
 import { useContatosLocais } from '../contexts/ContatosLocaisContext'
 import { listarContatos, POR_PAGINA } from '../services/contatos'
 import { mensagemDeErro } from '../utils/erros'
@@ -89,19 +90,9 @@ export default function Contatos() {
       </div>
 
       {loading ? (
-        <div className="estado" aria-live="polite">
-          <span className="girando" aria-hidden="true" />
-          <p>Carregando contatos…</p>
-        </div>
+        <Carregando texto="Carregando contatos…" />
       ) : erro ? (
-        <div className="estado">
-          <p role="alert" className="aviso erro">
-            {erro}
-          </p>
-          <button type="button" className="botao" onClick={() => setTentativa((n) => n + 1)}>
-            Tentar de novo
-          </button>
-        </div>
+        <ErroComTentativa mensagem={erro} aoTentar={() => setTentativa((n) => n + 1)} />
       ) : novos.length === 0 && visiveis.length === 0 ? (
         <div className="estado">
           <p>

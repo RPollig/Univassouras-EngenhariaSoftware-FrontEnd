@@ -1,57 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Carregando, ContatoNaoEncontrado, ErroComTentativa } from '../components/Estados'
 import { useContatosLocais } from '../contexts/ContatosLocaisContext'
-import { buscarContato, excluirContato } from '../services/contatos'
-import { ehNaoEncontrado, mensagemDeErro } from '../utils/erros'
-import type { Contato } from '../types'
+import { useContato } from '../hooks/useContato'
+import { excluirContato } from '../services/contatos'
+import { mensagemDeErro } from '../utils/erros'
 
 export default function ContatoDetalhe() {
   const { id: idDaUrl } = useParams() // /contatos/7 → "7" (sempre texto)
-  const id = Number(idDaUrl)
   const navigate = useNavigate()
   const location = useLocation()
   const avisoSucesso = (location.state as { aviso?: string } | null)?.aviso // ex.: "Alterações salvas."
-  const { buscarLocal, foiExcluido, ehLocal, registrarExcluido } = useContatosLocais()
+  const { ehLocal, registrarExcluido } = useContatosLocais()
 
-  const [contato, setContato] = useState<Contato | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
-  const [naoExiste, setNaoExiste] = useState(false)
-  const [tentativa, setTentativa] = useState(0)
+  // Carregar o contato (carregando / erro / 404) fica no hook useContato
+  const { contato, loading, erro, naoExiste, tentarDeNovo } = useContato(Number(idDaUrl))
+
   const [excluindo, setExcluindo] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
-
-  // Valores locais calculados fora do efeito (entram nas dependências)
-  const local = buscarLocal(id) // criado/editado neste app (a API não conhece a versão nova)
-  const excluido = foiExcluido(id) // excluído neste app
-
-  useEffect(() => {
-    async function carregar() {
-      setLoading(true)
-      setErro(null)
-      setNaoExiste(false)
-      // id inválido ou já excluído: "não encontrado"
-      if (!Number.isInteger(id) || id <= 0 || excluido) {
-        setNaoExiste(true)
-        setLoading(false)
-        return
-      }
-      if (local) {
-        setContato(local)
-        setLoading(false)
-        return
-      }
-      try {
-        setContato(await buscarContato(id))
-      } catch (err) {
-        if (ehNaoEncontrado(err)) setNaoExiste(true)
-        else setErro(mensagemDeErro(err))
-      } finally {
-        setLoading(false)
-      }
-    }
-    carregar()
-  }, [id, tentativa, local, excluido])
 
   async function excluir() {
     if (!contato) return
@@ -76,34 +42,24 @@ export default function ContatoDetalhe() {
 
   if (loading) {
     return (
-      <main className="pagina estado" aria-live="polite">
-        <span className="girando" aria-hidden="true" />
-        <p>Carregando contato…</p>
+      <main className="pagina">
+        <Carregando texto="Carregando contato…" />
       </main>
     )
   }
 
   if (naoExiste) {
     return (
-      <main className="pagina estado">
-        <h1>Contato não encontrado</h1>
-        <p className="apoio">Ele não existe ou foi removido.</p>
-        <Link to="/contatos" className="botao">
-          Voltar para a lista
-        </Link>
+      <main className="pagina">
+        <ContatoNaoEncontrado />
       </main>
     )
   }
 
   if (erro || !contato) {
     return (
-      <main className="pagina estado">
-        <p role="alert" className="aviso erro">
-          {erro ?? 'Não foi possível carregar o contato.'}
-        </p>
-        <button type="button" className="botao" onClick={() => setTentativa((n) => n + 1)}>
-          Tentar de novo
-        </button>
+      <main className="pagina">
+        <ErroComTentativa mensagem={erro ?? 'Não foi possível carregar o contato.'} aoTentar={tentarDeNovo} />
       </main>
     )
   }

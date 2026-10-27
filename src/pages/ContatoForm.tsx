@@ -1,236 +1,92 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Carregando, ContatoNaoEncontrado, ErroComTentativa } from '../components/Estados'
+import FormularioContato from '../components/FormularioContato'
 import { useContatosLocais } from '../contexts/ContatosLocaisContext'
-import { atualizarContato, buscarContato, criarContato } from '../services/contatos'
-import { ehNaoEncontrado, mensagemDeErro } from '../utils/erros'
-import type { Contato, ContatoDados } from '../types'
+import { useContato } from '../hooks/useContato'
+import { atualizarContato, criarContato } from '../services/contatos'
+import type { ContatoDados } from '../types'
 
-// Os campos do formulário (tudo texto, como vem dos inputs)
-type Campos = {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  empresa: string
-  cargo: string
-}
-type Erros = Partial<Record<keyof Campos, string>>
-
-const VAZIO: Campos = { firstName: '', lastName: '', email: '', phone: '', empresa: '', cargo: '' }
-
-// Validação fora do componente: fácil de ler e de testar
-function validar(c: Campos): Erros {
-  const erros: Erros = {}
-  if (c.firstName.trim().length < 2) erros.firstName = 'Escreve o nome (pelo menos 2 letras).'
-  if (c.lastName.trim().length < 2) erros.lastName = 'Escreve o sobrenome (pelo menos 2 letras).'
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email.trim())) erros.email = 'E-mail inválido. Ex.: ana@email.com'
-  const digitos = c.phone.replace(/\D/g, '')
-  if (c.phone.trim() && digitos.length < 8) erros.phone = 'Telefone com pelo menos 8 números.'
-  return erros
-}
-
-function paraCampos(c: Contato): Campos {
-  return {
-    firstName: c.firstName,
-    lastName: c.lastName,
-    email: c.email,
-    phone: c.phone ?? '',
-    empresa: c.company?.name ?? '',
-    cargo: c.company?.title ?? '',
-  }
-}
-
-function paraDados(c: Campos): ContatoDados {
-  return {
-    firstName: c.firstName.trim(),
-    lastName: c.lastName.trim(),
-    email: c.email.trim(),
-    phone: c.phone.trim(),
-    company: { name: c.empresa.trim(), title: c.cargo.trim() },
-  }
-}
-
+// Uma página, duas rotas: /contatos/novo (criar) e /contatos/:id/editar (editar)
 export default function ContatoForm() {
-  const { id: idDaUrl } = useParams() // existe só na rota /contatos/:id/editar
+  const { id: idDaUrl } = useParams() // existe só na rota de edição
   const editando = idDaUrl !== undefined
-  const id = Number(idDaUrl)
   const navigate = useNavigate()
-  const { buscarLocal, foiExcluido, ehLocal, registrarCriado, registrarEditado } = useContatosLocais()
+  const { ehLocal, registrarCriado, registrarEditado } = useContatosLocais()
 
-  const [campos, setCampos] = useState<Campos>(VAZIO)
-  const [original, setOriginal] = useState<Contato | null>(null)
-  const [erros, setErros] = useState<Erros>({})
-  const [erroEnvio, setErroEnvio] = useState<string | null>(null)
-  const [enviando, setEnviando] = useState(false)
-  const [loading, setLoading] = useState(editando)
-  const [erroCarga, setErroCarga] = useState<string | null>(null)
-  const [naoExiste, setNaoExiste] = useState(false)
+  // Na edição, carrega o contato; no "novo", passa null e não carrega nada
+  const { contato, loading, erro, naoExiste, tentarDeNovo } = useContato(editando ? Number(idDaUrl) : null)
 
-  const local = editando ? buscarLocal(id) : undefined
-  const excluido = editando && foiExcluido(id)
-
-  // Modo edição: carrega o contato para preencher os campos
-  useEffect(() => {
-    if (!editando) return
-    async function carregar() {
-      setLoading(true)
-      setErroCarga(null)
-      if (!Number.isInteger(id) || id <= 0 || excluido) {
-        setNaoExiste(true)
-        setLoading(false)
-        return
-      }
-      if (local) {
-        setOriginal(local)
-        setCampos(paraCampos(local))
-        setLoading(false)
-        return
-      }
-      try {
-        const contato = await buscarContato(id)
-        setOriginal(contato)
-        setCampos(paraCampos(contato))
-      } catch (err) {
-        if (ehNaoEncontrado(err)) setNaoExiste(true)
-        else setErroCarga(mensagemDeErro(err))
-      } finally {
-        setLoading(false)
-      }
-    }
-    carregar()
-  }, [editando, id, local, excluido])
-
-  // Um onChange só para todos os campos: usa o "name" do input
-  function mudar(e: ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target
-    setCampos((atual) => ({ ...atual, [name]: value }))
-    setErros((atual) => ({ ...atual, [name]: undefined })) // corrigiu o campo: some o aviso dele
+  // C — criar: 1º a API, depois o estado local, depois volta para a lista
+  async function criar(dados: ContatoDados) {
+    const resposta = await criarContato(dados)
+    const novo = registrarCriado({ ...resposta, ...dados })
+    navigate('/contatos', { state: { aviso: `Contato “${novo.firstName} ${novo.lastName}” criado.` } })
   }
 
-  async function aoEnviar(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault() // sem isso a página recarrega
-    const encontrados = validar(campos)
-    setErros(encontrados)
-    if (Object.keys(encontrados).length > 0) return // não envia nada
-
-    const dados = paraDados(campos)
-    setErroEnvio(null)
-    setEnviando(true) // botão desabilitado: sem clique duplo
-    try {
-      if (editando && original) {
-        // contato criado só no app: a API não o conhece (daria 404), então não chama
-        if (!ehLocal(original.id)) {
-          await atualizarContato(original.id, dados) // 1º a API…
-        }
-        registrarEditado({ ...original, ...dados }) // …depois o estado local
-        navigate(`/contatos/${original.id}`, { state: { aviso: 'Alterações salvas.' } })
-      } else {
-        const resposta = await criarContato(dados)
-        const novo = registrarCriado({ ...resposta, ...dados })
-        navigate('/contatos', { state: { aviso: `Contato “${novo.firstName} ${novo.lastName}” criado.` } })
-      }
-    } catch (err) {
-      setErroEnvio(mensagemDeErro(err)) // o que foi digitado continua no formulário
-    } finally {
-      setEnviando(false)
+  // U — editar: contato criado só no app não vai para a API (ela responderia 404)
+  async function editar(dados: ContatoDados) {
+    if (!contato) return
+    if (!ehLocal(contato.id)) {
+      await atualizarContato(contato.id, dados)
     }
+    registrarEditado({ ...contato, ...dados })
+    navigate(`/contatos/${contato.id}`, { state: { aviso: 'Alterações salvas.' } })
+  }
+
+  if (!editando) {
+    return (
+      <main className="pagina">
+        <Link to="/contatos" className="voltar">
+          ← Voltar
+        </Link>
+        <FormularioContato
+          titulo="Novo contato"
+          textoBotao="Cadastrar contato"
+          voltarPara="/contatos"
+          aoSalvar={criar}
+        />
+      </main>
+    )
   }
 
   if (loading) {
     return (
-      <main className="pagina estado" aria-live="polite">
-        <span className="girando" aria-hidden="true" />
-        <p>Carregando contato…</p>
+      <main className="pagina">
+        <Carregando texto="Carregando contato…" />
       </main>
     )
   }
 
   if (naoExiste) {
     return (
-      <main className="pagina estado">
-        <h1>Contato não encontrado</h1>
-        <p className="apoio">Não dá para editar um contato que não existe.</p>
-        <Link to="/contatos" className="botao">
-          Voltar para a lista
-        </Link>
+      <main className="pagina">
+        <ContatoNaoEncontrado />
       </main>
     )
   }
 
-  if (erroCarga) {
+  if (erro || !contato) {
     return (
-      <main className="pagina estado">
-        <p role="alert" className="aviso erro">
-          {erroCarga}
-        </p>
-        <Link to="/contatos" className="botao botao-sec">
-          Voltar para a lista
-        </Link>
+      <main className="pagina">
+        <ErroComTentativa mensagem={erro ?? 'Não foi possível carregar o contato.'} aoTentar={tentarDeNovo} />
       </main>
-    )
-  }
-
-  // Monta cada campo com label, input e mensagem de erro (evita repetir o mesmo JSX 6 vezes)
-  function campo(nome: keyof Campos, rotulo: string, tipo = 'text', autoComplete = 'off') {
-    const erro = erros[nome]
-    return (
-      <div className="campo">
-        <label htmlFor={nome}>{rotulo}</label>
-        <input
-          id={nome}
-          name={nome}
-          type={tipo}
-          value={campos[nome]}
-          onChange={mudar}
-          disabled={enviando}
-          autoComplete={autoComplete}
-          aria-invalid={erro !== undefined}
-          aria-describedby={erro ? `${nome}-erro` : undefined}
-        />
-        {erro && (
-          <span id={`${nome}-erro`} className="erro-campo">
-            {erro}
-          </span>
-        )}
-      </div>
     )
   }
 
   return (
     <main className="pagina">
-      <Link to={editando ? `/contatos/${id}` : '/contatos'} className="voltar">
+      <Link to={`/contatos/${contato.id}`} className="voltar">
         ← Voltar
       </Link>
-
-      <form onSubmit={aoEnviar} className="cartao formulario" noValidate>
-        <h1>{editando ? 'Editar contato' : 'Novo contato'}</h1>
-
-        <div className="grade-campos">
-          {campo('firstName', 'Nome *', 'text', 'given-name')}
-          {campo('lastName', 'Sobrenome *', 'text', 'family-name')}
-          {campo('email', 'E-mail *', 'email', 'email')}
-          {campo('phone', 'Telefone', 'tel', 'tel')}
-          {campo('empresa', 'Empresa', 'text', 'organization')}
-          {campo('cargo', 'Cargo', 'text', 'organization-title')}
-        </div>
-
-        <p className="sutil">* obrigatório</p>
-
-        {erroEnvio && (
-          <p role="alert" className="aviso erro">
-            {erroEnvio}
-          </p>
-        )}
-
-        <div className="acoes">
-          <button type="submit" className="botao" disabled={enviando}>
-            {enviando ? 'Salvando…' : editando ? 'Salvar alterações' : 'Cadastrar contato'}
-          </button>
-          <Link to={editando ? `/contatos/${id}` : '/contatos'} className="botao botao-sec">
-            Cancelar
-          </Link>
-        </div>
-      </form>
+      {/* key: se trocar de contato, o formulário recomeça com os dados certos */}
+      <FormularioContato
+        key={contato.id}
+        titulo="Editar contato"
+        textoBotao="Salvar alterações"
+        inicial={contato}
+        voltarPara={`/contatos/${contato.id}`}
+        aoSalvar={editar}
+      />
     </main>
   )
 }

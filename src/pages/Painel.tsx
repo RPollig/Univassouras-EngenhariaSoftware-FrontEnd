@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ContatoCard from '../components/ContatoCard'
+import { Carregando, ErroComTentativa } from '../components/Estados'
 import { useAuth } from '../contexts/AuthContext'
 import { useContatosLocais } from '../contexts/ContatosLocaisContext'
 import { contarContatos, listarContatos } from '../services/contatos'
@@ -53,19 +54,9 @@ export default function Painel() {
       </div>
 
       {loading ? (
-        <div className="estado" aria-live="polite">
-          <span className="girando" aria-hidden="true" />
-          <p>Carregando painel…</p>
-        </div>
+        <Carregando texto="Carregando painel…" />
       ) : erro ? (
-        <div className="estado">
-          <p role="alert" className="aviso erro">
-            {erro}
-          </p>
-          <button type="button" className="botao" onClick={() => setTentativa((n) => n + 1)}>
-            Tentar de novo
-          </button>
-        </div>
+        <ErroComTentativa mensagem={erro} aoTentar={() => setTentativa((n) => n + 1)} />
       ) : (
         <>
           <section className="numeros" aria-label="Resumo">
