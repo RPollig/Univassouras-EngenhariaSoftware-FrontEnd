@@ -17,6 +17,5 @@ O conteúdo será atualizado continuamente conforme novas aulas, desafios e proj
 |---|---|
 | `aula-02/` · `aula-03/` · `aula-05/` | Exercícios das aulas 2 a 5 |
 | `aula-08/` · `aula-09/` · `aula-10/` | Projeto FlyNow, uma pasta por aula |
+| `trabalho-p1-portfolio/` | **Trabalho P1 — Portfólio pessoal** |
 | `trabalho-p2-crm/` | **Trabalho P2 — CRM** (gestão de contatos) |
-
-Trabalho P1 (portfólio): [Portfolio-P1-FrontEnd-Renan-Pollig](https://github.com/RPollig/Portfolio-P1-FrontEnd-Renan-Pollig)
