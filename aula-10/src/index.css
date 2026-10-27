@@ -1026,3 +1026,134 @@ button {
     aspect-ratio: 4 / 3.6;
   }
 }
+
+/* =========================================================
+   Aula 10 · Bloco 4 — Meus desejos (CSS mobile-first)
+   Base = celular (uma coluna). @media (min-width) só ACRESCENTA.
+   ========================================================= */
+.desejos-pagina {
+  max-width: 60rem;
+  margin-inline: auto;
+}
+
+.form-desejo {
+  margin: 1.5rem 0 1rem;
+}
+
+.form-desejo label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tinta-2);
+}
+
+.form-desejo-linha {
+  display: flex;
+  flex-wrap: wrap; /* lado a lado se couber; senão quebra a linha */
+  gap: 0.5rem;
+}
+
+.form-desejo input {
+  flex: 1 1 14rem; /* cresce, encolhe, começa em 14rem */
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--linha);
+  background: #fff;
+  font: inherit;
+}
+
+.form-desejo input[aria-invalid='true'] {
+  border-color: var(--erro);
+}
+
+.form-desejo .aviso {
+  margin-top: 0.5rem;
+}
+
+/* alvo de toque: pelo menos 44px */
+.form-desejo input,
+.form-desejo .botao,
+.desejos-pagina .botao,
+.botao-excluir {
+  min-height: 44px;
+}
+
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: var(--muted);
+}
+
+.desejos {
+  display: grid;
+  grid-template-columns: 1fr; /* celular: uma coluna */
+  gap: 0.5rem;
+}
+
+.desejo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--linha);
+  background: var(--papel);
+}
+
+.desejo label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.desejo input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: var(--oceano);
+}
+
+.desejo.feito span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.botao-excluir {
+  padding: 0 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--linha);
+  background: #fff;
+  color: var(--erro);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botao-excluir:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* a partir de 40rem (640px): duas colunas */
+@media (min-width: 40rem) {
+  .desejos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* a partir de 64rem (1024px): três colunas */
+@media (min-width: 64rem) {
+  .desejos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
