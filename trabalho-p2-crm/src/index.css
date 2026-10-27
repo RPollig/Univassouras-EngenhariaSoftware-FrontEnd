@@ -1,0 +1,538 @@
+/* =========================================================
+   CRM · CSS mobile-first
+   A base é o CELULAR (uma coluna). As @media (min-width)
+   só ACRESCENTAM regras quando a tela cresce.
+   ========================================================= */
+
+:root {
+  --azul: #1f5f8b;
+  --azul-escuro: #17486a;
+  --azul-claro: #e8f1f8;
+  --texto: #1d2733;
+  --sutil: #5b6775;
+  --borda: #d6dde5;
+  --fundo: #f4f6f9;
+  --branco: #ffffff;
+  --erro: #b42318;
+  --erro-fundo: #fdecea;
+  --ok: #1e7b45;
+  --ok-fundo: #e7f5ec;
+  --raio: 12px;
+  --sombra: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+* {
+  box-sizing: border-box; /* padding e borda entram na largura: sem rolagem lateral */
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--texto);
+  background: var(--fundo);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 3vw + 0.75rem, 2.1rem); /* cresce com a tela, com mínimo e máximo */
+  line-height: 1.2;
+  margin: 0 0 0.25rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+a {
+  color: var(--azul);
+}
+
+code {
+  background: var(--azul-claro);
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+}
+
+/* ---------- Formulários e botões (alvo de toque ≥ 44px) ---------- */
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: var(--branco);
+}
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #8cc4ea;
+  outline-offset: 2px;
+}
+
+input[aria-invalid='true'] {
+  border-color: var(--erro);
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.5rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--branco);
+  background: var(--azul);
+  border: 1px solid var(--azul);
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao:hover {
+  background: var(--azul-escuro);
+}
+
+.botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.botao-sec {
+  color: var(--azul);
+  background: var(--branco);
+  border-color: var(--borda);
+}
+
+.botao-sec:hover {
+  background: var(--azul-claro);
+}
+
+.botao-perigo {
+  background: var(--erro);
+  border-color: var(--erro);
+}
+
+.botao-perigo:hover {
+  background: #8f1c13;
+}
+
+.botao-largo {
+  width: 100%;
+}
+
+/* ---------- Mensagens ---------- */
+
+.aviso {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+}
+
+.aviso.erro {
+  color: var(--erro);
+  background: var(--erro-fundo);
+  border: 1px solid #f5c2bc;
+}
+
+.aviso.sucesso {
+  color: var(--ok);
+  background: var(--ok-fundo);
+  border: 1px solid #b7e1c6;
+}
+
+.erro-campo {
+  display: block;
+  color: var(--erro);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.apoio,
+.sutil {
+  color: var(--sutil);
+  margin: 0.25rem 0;
+}
+
+.sutil {
+  font-size: 0.92rem;
+}
+
+/* ---------- Estados de tela (carregando, erro, vazio) ---------- */
+
+.tela-cheia,
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.tela-cheia {
+  min-height: 100vh;
+}
+
+.codigo {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: var(--azul);
+}
+
+.girando {
+  width: 32px;
+  height: 32px;
+  border: 4px solid var(--azul-claro);
+  border-top-color: var(--azul);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Cartões ---------- */
+
+.cartao {
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  padding: 1.25rem;
+}
+
+/* ---------- Login ---------- */
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: linear-gradient(160deg, var(--azul-claro), var(--fundo));
+}
+
+.login-form {
+  width: 100%;
+  max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-form input {
+  margin-bottom: 0.5rem;
+}
+
+.dica {
+  font-size: 0.9rem;
+  color: var(--sutil);
+  text-align: center;
+}
+
+/* ---------- Topo (menu) — celular: quebra em duas linhas ---------- */
+
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--branco);
+  border-bottom: 1px solid var(--borda);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.menu {
+  order: 3; /* no celular o menu vai para a linha de baixo */
+  width: 100%;
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+
+.menu-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  border-radius: 8px;
+  color: var(--sutil);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.menu-link.ativo {
+  color: var(--azul);
+  background: var(--azul-claro);
+  font-weight: 700;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ola {
+  display: none; /* no celular só o avatar e o botão Sair */
+}
+
+.avatar {
+  border-radius: 50%;
+  background: var(--azul-claro);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatar-g {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-xg {
+  width: 88px;
+  height: 88px;
+}
+
+.avatar-letra {
+  display: inline-grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--azul);
+}
+
+/* ---------- Páginas ---------- */
+
+.pagina {
+  max-width: 64rem;
+  margin-inline: auto;
+  padding: 1.25rem 1rem 2rem;
+}
+
+.cabecalho-pagina {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.busca {
+  margin-bottom: 1rem;
+}
+
+.voltar {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Lista de contatos: 1 coluna no celular */
+.lista-contatos {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.contato-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.contato-card:hover {
+  border-color: var(--azul);
+}
+
+.contato-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* deixa o texto longo quebrar em vez de estourar */
+  overflow-wrap: anywhere;
+}
+
+.selo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ok);
+  background: var(--ok-fundo);
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* Painel: números */
+.numeros {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.numero {
+  display: flex;
+  flex-direction: column;
+}
+
+.numero-valor {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--azul);
+}
+
+/* Detalhe */
+.detalhe-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dados {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.15rem;
+  margin: 0 0 1rem;
+}
+
+.dados dt {
+  font-weight: 700;
+  color: var(--sutil);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.dados dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Formulário: 1 coluna no celular */
+.formulario {
+  max-width: 44rem;
+}
+
+.grade-campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.rodape {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--sutil);
+  padding: 1.5rem 1rem;
+}
+
+/* =========================================================
+   A partir de 40rem (640px): telas médias
+   ========================================================= */
+@media (min-width: 40rem) {
+  .ola {
+    display: inline;
+  }
+
+  .lista-contatos,
+  .grade-campos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .numeros {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dados {
+    grid-template-columns: 8rem 1fr;
+    gap: 0.5rem 1rem;
+  }
+
+  .dados dt {
+    margin-top: 0;
+  }
+}
+
+/* =========================================================
+   A partir de 64rem (1024px): notebook — menu numa linha só
+   ========================================================= */
+@media (min-width: 64rem) {
+  .topo {
+    padding: 0.75rem 2rem;
+  }
+
+  .menu {
+    order: 0;
+    width: auto;
+    flex: 1;
+  }
+
+  .lista-contatos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
