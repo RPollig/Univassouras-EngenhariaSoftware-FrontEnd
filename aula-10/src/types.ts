@@ -33,3 +33,12 @@ export type Usuario = {
   lastName: string
   image: string
 }
+
+// Desejo de viagem (Aula 10 — CRUD em /todos do DummyJSON)
+// todo = texto do desejo · completed = já visitei
+export type Desejo = {
+  id: number
+  todo: string
+  completed: boolean
+  userId: number
+}
