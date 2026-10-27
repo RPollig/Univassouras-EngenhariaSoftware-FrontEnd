@@ -19,3 +19,17 @@ export async function criarDesejo(todo: string, userId: number): Promise<Desejo>
   })
   return data
 }
+
+// U — atualizar só os campos que mudam (PATCH)
+export async function atualizarDesejo(
+  id: number,
+  campos: Partial<Pick<Desejo, 'todo' | 'completed'>>,
+): Promise<Desejo> {
+  const { data } = await api.patch<Desejo>(`/todos/${id}`, campos)
+  return data
+}
+
+// D — excluir
+export async function excluirDesejo(id: number): Promise<void> {
+  await api.delete(`/todos/${id}`)
+}

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { listarDesejos, criarDesejo } from '../services/desejos'
+import { listarDesejos, criarDesejo, atualizarDesejo, excluirDesejo } from '../services/desejos'
+import DesejoItem from '../components/DesejoItem'
 import { mensagemDeErro } from '../utils/erros'
 import type { Desejo } from '../types'
 
@@ -25,6 +26,15 @@ export default function Desejos() {
   const [texto, setTexto] = useState('')
   const [erroForm, setErroForm] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+
+  // U e D — qual item está esperando a API (só ele fica desabilitado) e aviso da lista
+  const [ocupado, setOcupado] = useState<number | null>(null)
+  const [aviso, setAviso] = useState<string | null>(null)
+
+  // Ids que só existem no app (a API de treino não gravou): PATCH/DELETE neles dariam 404
+  const idsLocais = useRef(new Set<number>())
+  // O DummyJSON devolve o MESMO id para todo desejo novo; damos um id local único
+  const proximoIdLocal = useRef(100000)
 
   // Ler (R): carrega os desejos de quem está logado(a)
   useEffect(() => {
@@ -54,13 +64,51 @@ export default function Desejos() {
     setErroForm(null)
     setEnviando(true) // botão desabilitado: sem clique duplo
     try {
-      const novo = await criarDesejo(limpo, userId)
+      const criado = await criarDesejo(limpo, userId)
+      proximoIdLocal.current += 1
+      const novo = { ...criado, id: proximoIdLocal.current }
+      idsLocais.current.add(novo.id) // anota: este só existe no app
       setDesejos((lista) => [...lista, novo]) // a API não grava: atualiza o estado local
       setTexto('')
     } catch (err) {
       setErroForm(mensagemDeErro(err))
     } finally {
       setEnviando(false)
+    }
+  }
+
+  // Atualizar (U): marcar como feito — 1º a API, depois a tela
+  async function alternar(d: Desejo) {
+    setAviso(null)
+    setOcupado(d.id)
+    try {
+      if (!idsLocais.current.has(d.id)) {
+        await atualizarDesejo(d.id, { completed: !d.completed })
+      }
+      setDesejos((lista) =>
+        lista.map((x) => (x.id === d.id ? { ...x, completed: !x.completed } : x)),
+      )
+    } catch (err) {
+      setAviso(mensagemDeErro(err)) // a tela não muda e mostra o motivo
+    } finally {
+      setOcupado(null)
+    }
+  }
+
+  // Excluir (D): confirma, chama a API e só depois tira da tela
+  async function excluir(d: Desejo) {
+    if (!window.confirm(`Excluir “${d.todo}”?`)) return
+    setAviso(null)
+    setOcupado(d.id)
+    try {
+      if (!idsLocais.current.has(d.id)) {
+        await excluirDesejo(d.id)
+      }
+      setDesejos((lista) => lista.filter((x) => x.id !== d.id))
+    } catch (err) {
+      setAviso(mensagemDeErro(err))
+    } finally {
+      setOcupado(null)
     }
   }
 
@@ -104,13 +152,24 @@ export default function Desejos() {
       ) : desejos.length === 0 ? (
         <p className="vazio">Nenhum desejo ainda. Que tal “Conhecer Lisboa”?</p>
       ) : (
-        <ul className="desejos">
-          {desejos.map((d) => (
-            <li key={d.id} className={d.completed ? 'desejo feito' : 'desejo'}>
-              <span>{d.todo}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          {aviso && (
+            <p role="alert" className="aviso erro">
+              {aviso}
+            </p>
+          )}
+          <ul className="desejos">
+            {desejos.map((d) => (
+              <DesejoItem
+                key={d.id}
+                desejo={d}
+                ocupado={ocupado === d.id}
+                aoAlternar={alternar}
+                aoExcluir={excluir}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </main>
   )
