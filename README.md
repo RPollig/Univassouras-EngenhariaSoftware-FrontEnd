@@ -57,9 +57,10 @@ React · TypeScript · Vite · React Router · Axios · CSS
 src/
   services/   http.ts (Axios + interceptors) · auth.ts · contatos.ts (CRUD)
   contexts/   AuthContext (login/token) · ContatosLocaisContext (mudanças feitas no app)
+  hooks/      useContato (carrega um contato: carregando / erro / 404)
   routes/     ProtectedRoute (só entra logado)
   pages/      Login · Painel · Contatos · ContatoDetalhe · ContatoForm · NaoEncontrada
-  components/ Header · Layout · ContatoCard
+  components/ Header · Layout · ContatoCard · FormularioContato · Estados
   utils/      erros.ts (mensagem por status)
   types.ts
 ```
