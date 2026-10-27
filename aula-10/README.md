@@ -1,7 +1,8 @@
-# FlyNow · Aulas 8 e 9
+# FlyNow · Aulas 8 a 10
 
 Aula 8: DOM · HOF · Axios · useEffect  
-Aula 9: Closures · Módulos · React Router · Context · Login com token (JWT)
+Aula 9: Closures · Módulos · React Router · Context · Login com token (JWT)  
+Aula 10: CRUD · tratamento de erro · interceptors · layout responsivo
 
 Laboratório de Programação Front End, Engenharia de Software, Universidade de Vassouras (2026.2)
 Professora: Laís Cristine Bordallo Pinheiro · Aluno: Renan Pollig
@@ -95,3 +96,22 @@ Aperte F5 depois: tudo volta ao normal, porque a fonte da verdade é o código e
 - [x] Token adulterado + F5: cai no login
 
 > Avisos do lint em `AuthContext.tsx` (`only-export-components` e `set-state-in-effect`) são esperados: a própria aula diz que podem ser ignorados.
+
+---
+
+## Aula 10: CRUD, erros e responsivo
+
+Tela **Meus desejos** (`/desejos`, protegida) com o recurso `/todos` do DummyJSON (`todo` = texto do desejo, `completed` = já visitei).
+
+| Bloco | O que foi pedido | Arquivo |
+|---|---|---|
+| 1 · Ler e criar | `GET /todos/user/{id}` com 4 estados (carregando, erro, vazio, lista) · `POST /todos/add` com formulário validado, `preventDefault`, botão "Salvando…" | `services/desejos.ts` · `pages/Desejos.tsx` · `types.ts` |
+| 2 · Editar e excluir | `PATCH /todos/{id}` + `map` · `DELETE` com `window.confirm` + `filter` · API primeiro, tela depois · ids locais para o item criado | `components/DesejoItem.tsx` · `pages/Desejos.tsx` |
+| 3 · Erros | `mensagemDeErro` por status (400, 401, 404, 5xx, sem rede, timeout) · interceptor de request (token) e de response (401 → logout) · `timeout: 10000` · "Tentar de novo" | `utils/erros.ts` · `services/http.ts` · `contexts/AuthContext.tsx` |
+| 4 · Responsivo | CSS mobile-first: flex com `wrap`, grid 1 → 2 → 3 colunas com `@media (min-width)`, botões ≥ 44 px | `index.css` (final) · `index.html` (viewport) |
+
+### Observações
+
+- O DummyJSON **só simula** criar, editar e excluir: a tela atualiza o estado local. No F5 o desejo criado some (comportamento da API de treino).
+- O DummyJSON devolve o **mesmo id** para todo desejo novo. Por isso cada desejo criado ganha um id local único e é anotado em `idsLocais` (`useRef`): marcar ou excluir esse item não chama a API (ela responderia 404).
+- Testado em 360 e 375 px sem rolagem lateral (DevTools → Ctrl+Shift+M).

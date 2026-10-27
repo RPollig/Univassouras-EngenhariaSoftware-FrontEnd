@@ -9,7 +9,7 @@ export default function Layout() {
       <Outlet />
       <footer className="rodape">
         <div>
-          <strong>FlyNow</strong> · Aulas 8 e 9 · DOM · HOF · Axios · useEffect · Router · Context ·
+          <strong>FlyNow</strong> · Aulas 8 a 10 · DOM · HOF · Axios · useEffect · Router · Context · CRUD ·
           Login
         </div>
         <div>
